@@ -32,6 +32,7 @@ P1 是唯一有硬性驗收的一期：用 TBCA 的資料生出一則 Threads �
 |---|---|
 | [`CLAUDE.md`](./CLAUDE.md) | **開發契約**。硬規則、目錄結構、P1 任務清單與驗收條件。開工前先讀這份。 |
 | [`docs/architecture.md`](./docs/architecture.md) | 系統架構 v1.0。分層、技術選型、完整資料模型、Generator 抽象、Guardrail Pipeline、分期。 |
+| [`docs/functional-architecture.md`](./docs/functional-architecture.md) | 系統功能架構。功能全景圖、六個功能層、七個模組的規格與依賴、功能 × 分期 × 角色對照。 |
 | [`docs/m7-landing-page.md`](./docs/m7-landing-page.md) | M7 募款銷售頁規格 v1.0。十二拍敘事結構、12 種區塊 schema、進度條的合規改法。 |
 | [`docs/open-questions.md`](./docs/open-questions.md) | 交叉比對兩份文件後尚未收斂的決定，動工前要先拍板。 |
 
