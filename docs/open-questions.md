@@ -161,12 +161,161 @@ $$;
 
 ---
 
+## E. Skill 層（比對 `skills-inventory.md` 後補，2026-08-06）
+
+### E1. `threads-method-tbca` 這支 skill 不存在 ★ 這回答了清單 §6 第一題
+
+清單 §1.2 要把 `threads-method-tbca` 泛化成 `threads-method-npo`，
+§6 也問「它是獨立檔還是內嵌在某支 content-os」。
+
+查過目前可用的 skill 清單，**沒有這個名字的 skill**。
+七型範式的邏輯內嵌在 `ad-engine-content-os` 裡——那支的說明明確寫著
+「Threads 從七型範式隨機挑 3 型」，NPO 線走它的 §2.1-C。
+
+→ §1.2 的來源要改成「從 `ad-engine-content-os` 的 NPO 線抽出七型範式邏輯」。
+泛化的難度也不同：不是改一支專屬 skill 的變數，是從一支很大的週排程 skill 裡**切出**內容生成那段。
+
+### E2. `npo-meta-writer` 已被取代，而且品牌是寫死的 ★
+
+清單把它列為「✅ 複用不動」，同時餵給 M3 與 M4。兩個問題：
+
+1. `ad-engine-content-os` 的說明寫著它「**取代並合併** ai-daily-recap-writer +
+   npo-threads-writer + **npo-meta-writer**」。清單把一支已被取代的 skill 當成 M3/M4 的主要來源。
+2. 更要緊的是，`npo-meta-writer` 是**專為「8件小事」品牌**寫的，協會名寫死在裡面。
+   M3/M4 要服務多協會，它不可能「複用不動」。
+
+→ 要嘛改從 `ad-engine-content-os` 抽，要嘛把它一起列入「需泛化」。
+
+### E3. `npo-social-card` 的配色也是寫死的
+
+版型是「黑底白字 × **焰橘**」。但 `org_voice` 有 `primary_color` / `accent_color`，
+多協會共用時一定要吃這兩個欄位，否則所有協會的輪播圖長得一模一樣。
+
+→ 從「✅ 複用」改成「✏️ 修改（配色變數化）」。
+
+### E4. 因此 §5 的統計要改
+
+「新建 5、修改 2、複用 5」→ 實際上是 **新建 5、修改 4、複用 3**。
+
+| | |
+|---|---|
+| 修改 | `npo-fundraising-audit`、七型範式（來源改為 `ad-engine-content-os`）、`npo-meta-writer`、`npo-social-card` |
+| 複用 | `npo-fundraising-ad-prompt`、`service-catalog`、`brand-positioning-architect` |
+
+「真正能原封不動複用的只有三支」是個值得知道的事實——泛化的工作量比清單預估的多一倍。
+
+### E5. `npo-fundraising-audit` 同時出現在「不動」與「要改」兩張表
+
+§1.1 第一列與 §1.2 第一列都是它，§5 總表寫的是「✏️ 改（加導流）」。
+→ §1.1 該刪掉這列。（刪掉後複用剛好 5 支，正好對上 §5 的統計，可以確定是 §1.1 多列了。）
+
+### E6. §1.3 的「優先序」欄用 P0/P1/P2，會被讀成 Phase
+
+§1.3 標 org-brain / guard = P0、annual-plan = P1、landing / adgrants = P2。
+但 §2、§4、§5 三處的 Phase 是：org-brain / guard = P1、adgrants = P2、annual-plan = **P3**、landing = **P4**。
+
+那一欄看起來是排序序號（第 0、第 1、第 2 順位），但寫成 `P0/P1/P2` 跟 Phase 撞名。
+→ 改成 ①②③，或直接對齊 Phase。
+
+### E7. `npo-compliance-guard` 標題寫「六道檢查」，表列八道
+
+G1～G8。標題沒更新而已。
+
+### E8. guard 只做到 G8，但 M7 需要 G9～G11
+
+`m7-landing-page.md` §8 定義了 G9（換算式數字須有來源）、G10（服務數據須來自 `org_facts`）、
+G11（AI 生成圖須標示）。而 `npo-landing-builder` 的流程第 4 步是「過 `npo-compliance-guard`」，
+但 guard 的清單只到 G8。
+
+→ guard 補三關，或 landing-builder 自帶。前者比較好，守門集中在一個地方。
+
+### E9. 對話層的 guard 和系統層的 guard，嚴格度根本不同 ★
+
+清單 §2 說 M0「純程式為主，語意判斷用 `guard_semantic/v1`」。
+但**對話層的 `npo-compliance-guard` skill 沒有程式可以跑**——
+G1 掃數字比對事實庫、G5 查字典、G3 查字號效期，在對話裡全部只能靠 LLM 盡力做。
+
+這代表：**對話層跑過 guard ≠ 系統層會過**，反過來也是。
+
+→ 影響 §6 第三題（先在對話層各跑一次驗證再蒸餾）。這個建議是對的，但要講清楚它驗的是什麼：
+**對話層驗證的是文案品質與判斷邏輯，不是守門正確性。**
+守門正確性只能在系統層用黃金測試集驗（見 `gap-analysis.md` C4）。
+兩件事不要混，否則會以為 skill 跑得順就等於守門做好了。
+
+### E10. 大陸用語字典擴充了兩條，但有一條純字典做不到
+
+清單新增 `渠道→管道`、`優化→最佳化(視情境)`，CLAUDE.md 硬規則 5 的清單要同步補上。
+
+但 **「優化→最佳化(視情境)」帶條件，純字典比對做不到**。
+「優化」在台灣的技術與商業語境其實很常用，無條件替換會改錯。
+
+→ `mainland-terms.json` 的 schema 要支援三種處置，不能只有「替換」：
+
+```json
+{ "from": "視頻", "to": "影片", "action": "auto" }
+{ "from": "優化", "to": "最佳化", "action": "warn", "note": "技術語境可保留，交人工判斷" }
+```
+
+`auto` 自動改、`warn` 只提示不改、`block` 直接擋。「優化」歸 `warn`。
+
+### E11. Prompt Pack 命名少了模組前綴
+
+CLAUDE.md 的目錄結構與 `architecture.md` §5.2 都是 `prompts/m3_content/v1.md`（**有**模組前綴），
+清單 §2 寫的是 `content/v1`、`audit/v1`（**沒有**前綴）。
+
+→ 統一用有前綴的版本，排序時自然按模組分組。
+
+另外清單新增了 `org_brain/v1` 與 `guard_semantic/v1` 兩個 pack，
+`architecture.md` §5.2 的目錄樹沒有它們，要補。
+
+### E12. M6 說「無 Prompt Pack」，但 adgrants-ops 要改寫 RSA 文案
+
+§2 說「M6 儀表板走純資料，無 Prompt Pack」，§5 總表 adgrants 的 pack 欄也是「—」。
+但 §3.5 的流程第 3 步是「產出調整建議：關鍵字增刪、否定字、**RSA 文案改寫**」——文案改寫一定要 LLM。
+
+→ 要決定：Ad Grants 建議只在對話層做（顧問跑 skill、系統只顯示數據），
+還是系統層也要做（那就需要一個 pack）。
+
+### E13. `brand-positioning-architect` 與 `npo-org-brain` 的分工要界定
+
+兩支都在做協會定調，重疊在「語氣 / voice」那塊。
+
+建議分法：`brand-positioning-architect` 做**策略層**（定位、使命、品牌人格），
+`npo-org-brain` 做**資料層**（身分、字號、事實、紅線）。
+`org_voice.tone` 到底由誰產出，要講明。
+
+### E14. `npo-org-brain` 補上了自檢 A1 的一半——而且這是好消息 ★
+
+`gap-analysis.md` A1 說「事實庫沒有匯入機制，是產品的單點失敗」。
+`npo-org-brain` 正好做這件事：逆向偵察 + 結構化訪談 + 每條數字都要問出處。
+
+但它是**對話層 skill**，跑的人是你或顧問，不是協會自己。
+
+這其實**讓 P1 變小了**：如果接受「P1 的協會腦由顧問用 skill 建檔後匯入 DB」，
+那 `gap-analysis.md` 的 A1（web app 的年報匯入 UI）與 A2（onboarding 引導）都可以往後排，
+P1 只需要一個「匯入 JSON」的後台功能就夠了。
+
+**但要明確承認一件事：這代表 P1 不是自助 SaaS，是顧問陪跑工具。**
+這個定位決定了 P2 要不要補自助建檔，也決定了定價頁怎麼寫。這題值得單獨拍板。
+
+---
+
 ## D. 動工前的最小決策集
 
-只有這五題會擋住 T2（建 schema 與 migration），其餘可以邊做邊定：
+會擋住 T2（建 schema 與 migration）的：
 
 1. **B1** RLS 遞迴的解法 → 決定 `current_org_ids()` 要不要用
 2. **B2** `orgs` / `org_voice` 的 policy 寫法
 3. **B3** `users` 用 `auth.users` 還是自建鏡像
 4. **B4** `content_items.campaign_id` P1 要不要留
 5. **A3 / B8** `generations` 的欄位要不要加 `cost_breakdown` 與 `raw_output`
+
+會擋住 T6／T7（Generator 與守門）的：
+
+6. **E1 / E2** 七型範式從哪裡抽——沒有 `threads-method-tbca` 這支，來源要重新指定
+7. **E10** `mainland-terms.json` 的 schema 要不要支援 `auto` / `warn` / `block` 三種處置
+8. **E11** Prompt Pack 的命名慣例
+
+會影響產品定位與定價的：
+
+9. **E14** P1 是自助 SaaS 還是顧問陪跑工具
