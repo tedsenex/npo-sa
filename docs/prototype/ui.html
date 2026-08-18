@@ -1,0 +1,582 @@
+<title>協會腦工作台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+
+<style>
+:root{
+  --paper:#FBFAF6; --surface:#FFFFFF; --surface-2:#F4F3EE; --surface-3:#EDEBE3;
+  --line:#E3E0D7; --line-strong:#CCC8BB;
+  --ink:#1A2233; --ink-2:#4C5668; --ink-3:#828A99;
+  --accent:#33477E; --accent-2:#4A62A3; --accent-soft:#E9ECF6;
+  --pass:#2F6B4F; --pass-soft:#E4EFE8;
+  --warn:#8F621A; --warn-soft:#F6EEDA;
+  --block:#AC3823; --block-soft:#F8E6E1;
+  --shadow:0 1px 2px rgba(26,34,51,.05), 0 8px 24px -12px rgba(26,34,51,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#11151D; --surface:#171C26; --surface-2:#1E242F; --surface-3:#252C38;
+    --line:#2B323E; --line-strong:#3D4552;
+    --ink:#E9EBF0; --ink-2:#A9B1C0; --ink-3:#79808F;
+    --accent:#94A9DE; --accent-2:#AFC0EA; --accent-soft:#212940;
+    --pass:#7FC3A2; --pass-soft:#18261F;
+    --warn:#D9AE6A; --warn-soft:#282116;
+    --block:#E28E79; --block-soft:#2C1D19;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11151D; --surface:#171C26; --surface-2:#1E242F; --surface-3:#252C38;
+  --line:#2B323E; --line-strong:#3D4552;
+  --ink:#E9EBF0; --ink-2:#A9B1C0; --ink-3:#79808F;
+  --accent:#94A9DE; --accent-2:#AFC0EA; --accent-soft:#212940;
+  --pass:#7FC3A2; --pass-soft:#18261F;
+  --warn:#D9AE6A; --warn-soft:#282116;
+  --block:#E28E79; --block-soft:#2C1D19;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Noto Serif TC",Georgia,serif; font-weight:700; margin:0; text-wrap:balance; letter-spacing:.01em}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+
+/* ---------- shell ---------- */
+.app{display:grid; grid-template-columns:236px 1fr; min-height:100vh}
+.side{
+  background:var(--surface-2); border-right:1px solid var(--line);
+  display:flex; flex-direction:column; gap:4px; padding:20px 14px;
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+}
+.brand{display:flex; align-items:center; gap:10px; padding:0 8px 18px}
+.seal{
+  width:32px;height:32px;border-radius:7px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-family:"Noto Serif TC",serif;font-weight:700;font-size:17px;flex:none;
+}
+.brand b{font-family:"Noto Serif TC",serif;font-size:15px;letter-spacing:.02em;display:block;line-height:1.3}
+.brand span{font-size:11px;color:var(--ink-3);letter-spacing:.06em}
+
+.navlabel{font-size:11px;letter-spacing:.14em;color:var(--ink-3);padding:16px 8px 6px;font-weight:500}
+.nav{
+  display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+  background:none;border:0;border-radius:7px;padding:8px 10px;cursor:pointer;
+  color:var(--ink-2);font:inherit;font-size:14px;transition:background .12s,color .12s;
+}
+.nav:hover{background:var(--surface-3);color:var(--ink)}
+.nav[aria-current="true"]{background:var(--accent); color:#fff; font-weight:500}
+:root[data-theme="dark"] .nav[aria-current="true"],
+:root:not([data-theme="light"]) .nav[aria-current="true"]{color:var(--paper)}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .nav[aria-current="true"]{color:#fff}}
+.nav .k{font-family:"IBM Plex Mono",monospace;font-size:11px;opacity:.7;width:22px;flex:none}
+.nav:disabled{opacity:.42;cursor:not-allowed}
+.nav:disabled:hover{background:none;color:var(--ink-2)}
+.soon{margin-left:auto;font-size:10px;letter-spacing:.08em;color:var(--ink-3);border:1px solid var(--line-strong);border-radius:4px;padding:0 4px}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.top{
+  display:flex;align-items:center;gap:14px;padding:14px 28px;
+  border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:5;flex-wrap:wrap;
+}
+.orgpick{
+  display:flex;align-items:center;gap:8px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:7px;padding:5px 11px;font-size:13.5px;cursor:pointer;color:var(--ink);
+}
+.orgpick .dot{width:7px;height:7px;border-radius:50%;background:var(--pass)}
+.spacer{flex:1}
+.meter{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink-2)}
+.bar{width:78px;height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.demo{
+  font-size:11px;letter-spacing:.1em;color:var(--warn);
+  background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);
+  border-radius:4px;padding:2px 7px;
+}
+.wrap{padding:28px;max-width:1180px;width:100%}
+
+/* ---------- primitives ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:11px}
+.pad{padding:20px}
+.ph{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.ph h2{font-size:15px}
+.eyebrow{font-size:11px;letter-spacing:.14em;color:var(--ink-3);font-weight:500}
+.pagehead{margin-bottom:20px}
+.pagehead h1{font-size:24px;margin:3px 0 5px}
+.pagehead p{margin:0;color:var(--ink-2);font-size:14px;max-width:60ch}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:20px;align-items:start}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;
+  border-radius:5px;padding:2px 7px;letter-spacing:.02em;white-space:nowrap;
+}
+.chip.pass{background:var(--pass-soft);color:var(--pass)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.block{background:var(--block-soft);color:var(--block)}
+.chip.ghost{background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line)}
+.btn{
+  font:inherit;font-weight:500;border-radius:8px;padding:10px 18px;cursor:pointer;
+  background:var(--accent);color:#fff;border:1px solid transparent;transition:filter .12s;
+}
+:root[data-theme="dark"] .btn,:root:not([data-theme="light"]) .btn{color:var(--paper)}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .btn{color:#fff}}
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:none;color:var(--ink-2);border-color:var(--line-strong)}
+.btn.ghost:hover{background:var(--surface-2);filter:none}
+.btn.sm{padding:6px 12px;font-size:13px}
+:focus-visible{outline:2.5px solid var(--accent-2);outline-offset:2px;border-radius:4px}
+
+/* ---------- archetypes ---------- */
+.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.type{
+  text-align:left;background:var(--surface-2);border:1.5px solid var(--line);
+  border-radius:9px;padding:11px 12px;cursor:pointer;font:inherit;color:var(--ink);
+  display:flex;flex-direction:column;gap:3px;transition:border-color .12s,background .12s;
+}
+.type:hover:not(:disabled){border-color:var(--accent-2)}
+.type[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.type:disabled{opacity:.45;cursor:not-allowed}
+.type .code{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--accent);letter-spacing:.06em}
+.type .nm{font-size:13.5px;font-weight:500;line-height:1.35}
+.type .eng{font-size:11.5px;color:var(--ink-3)}
+.type .quota{font-size:10.5px;color:var(--block);font-family:"IBM Plex Mono",monospace}
+
+label.fl{display:block;font-size:13px;font-weight:500;margin-bottom:5px}
+.req{color:var(--block);font-size:11px;margin-left:3px}
+.hint{font-size:12.5px;color:var(--ink-3);margin:0 0 9px;line-height:1.55}
+textarea,input[type=text]{
+  width:100%;font:inherit;font-size:14.5px;color:var(--ink);background:var(--surface-2);
+  border:1.5px solid var(--line);border-radius:9px;padding:12px 13px;resize:vertical;line-height:1.7;
+}
+textarea:focus,input:focus{border-color:var(--accent);outline:none;background:var(--surface)}
+textarea::placeholder{color:var(--ink-3)}
+
+/* ---------- output ---------- */
+.post{
+  font-size:15px;line-height:2.05;white-space:pre-wrap;
+  border-left:2.5px solid var(--line-strong);padding-left:16px;margin:0;
+}
+mark.redact{
+  background:var(--block-soft);color:var(--block);font-weight:500;
+  border-radius:3px;padding:1px 4px;font-size:14px;
+}
+mark.fixed{
+  background:transparent;color:var(--ink);
+  border-bottom:2px dotted var(--warn);padding-bottom:1px;
+}
+mark.ok{background:var(--pass-soft);color:var(--pass);border-radius:3px;padding:1px 4px}
+sup.mk{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--ink-3);margin-left:2px}
+
+.guard{border-top:1px solid var(--line)}
+.guard:first-of-type{border-top:0}
+.grow{display:flex;align-items:center;gap:10px;padding:11px 20px}
+.gcode{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);width:22px;flex:none}
+.gname{font-size:13.5px;flex:1;min-width:0}
+.gnote{padding:0 20px 13px 52px;font-size:12.5px;color:var(--ink-2);display:grid;gap:7px}
+.fix{
+  display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  background:var(--surface-2);border-radius:7px;padding:8px 11px;font-size:12.5px;
+}
+.fix .from{color:var(--block);text-decoration:line-through;text-decoration-thickness:1px}
+.fix .to{color:var(--ink);font-weight:500}
+.fix .why{color:var(--ink-3);font-size:11.5px;width:100%}
+.arrow{color:var(--ink-3)}
+
+.cost{
+  display:flex;gap:22px;flex-wrap:wrap;padding:13px 20px;
+  border-top:1px solid var(--line);background:var(--surface-2);
+  border-radius:0 0 10px 10px;font-size:12px;color:var(--ink-3);
+}
+.cost b{display:block;font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+
+.empty{padding:56px 24px;text-align:center;color:var(--ink-3)}
+.empty .ic{font-size:26px;opacity:.4}
+.empty p{margin:9px auto 0;max-width:34ch;font-size:13.5px;line-height:1.7}
+
+/* ---------- tables / stats ---------- */
+.tblwrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{
+  text-align:left;font-size:11px;letter-spacing:.11em;color:var(--ink-3);font-weight:500;
+  padding:9px 14px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .src{color:var(--ink-3);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:16px 18px}
+.stat .lb{font-size:11.5px;color:var(--ink-3);letter-spacing:.04em}
+.stat .vl{font-family:"Noto Serif TC",serif;font-size:27px;font-weight:700;line-height:1.25;margin-top:3px;font-variant-numeric:tabular-nums}
+.stat .sb{font-size:12px;color:var(--ink-3);margin-top:2px}
+.stat .bar{width:100%;margin-top:9px}
+.notice{
+  display:flex;gap:11px;align-items:flex-start;background:var(--warn-soft);
+  border:1px solid color-mix(in srgb,var(--warn) 26%,transparent);
+  border-radius:9px;padding:12px 15px;font-size:13.5px;color:var(--ink);margin-bottom:20px;
+}
+.notice b{color:var(--warn)}
+.brainrows{display:grid;gap:1px;background:var(--line);border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.brainrow{background:var(--surface);padding:13px 17px;display:flex;align-items:center;gap:13px}
+.brainrow .nm{font-size:14px;font-weight:500;flex:1}
+.brainrow .ct{font-size:12.5px;color:var(--ink-3)}
+.tabs{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.tab{
+  font:inherit;font-size:13.5px;background:none;border:0;border-bottom:2px solid transparent;
+  padding:8px 13px;cursor:pointer;color:var(--ink-3);margin-bottom:-1px;
+}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+.tab:hover{color:var(--ink)}
+
+.spin{display:inline-block;width:13px;height:13px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.reveal{animation:rv .4s ease both}
+@keyframes rv{from{opacity:0;transform:translateY(7px)}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+[hidden]{display:none!important}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;border-right:0;border-bottom:1px solid var(--line);padding:12px}
+  .brand{padding:0 12px 0 4px}
+  .navlabel{display:none}
+  .nav{width:auto}
+  .grid2{grid-template-columns:1fr}
+  .wrap{padding:20px 16px}
+  .top{padding:12px 16px}
+}
+</style>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="seal">腦</div>
+      <div><b>協會腦工作台</b><span>NPO WORKBENCH</span></div>
+    </div>
+
+    <div class="navlabel">建檔</div>
+    <button class="nav" data-v="brain"><span class="k">M-1</span>協會腦</button>
+
+    <div class="navlabel">產出</div>
+    <button class="nav" data-v="m3" aria-current="true"><span class="k">M3</span>社群內容</button>
+    <button class="nav" disabled><span class="k">M4</span>廣告文案<span class="soon">P2</span></button>
+    <button class="nav" disabled><span class="k">M5</span>廣告圖片<span class="soon">P4</span></button>
+
+    <div class="navlabel">回看</div>
+    <button class="nav" data-v="hist"><span class="k">—</span>產出歷史</button>
+    <button class="nav" data-v="home"><span class="k">—</span>儀表板</button>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <button class="orgpick"><span class="dot"></span>TBCA<span style="color:var(--ink-3);font-size:11px">切換</span></button>
+      <span class="demo">示範資料</span>
+      <div class="spacer"></div>
+      <div class="meter">協會腦 <div class="bar"><i style="width:80%"></i></div> 80%</div>
+      <div class="meter">本月額度 <div class="bar"><i style="width:34%"></i></div> <span class="mono">17／50</span></div>
+    </header>
+
+    <!-- ===================== M3 ===================== -->
+    <div class="wrap" data-view="m3">
+      <div class="pagehead">
+        <div class="eyebrow">M3 · 社群內容</div>
+        <h1>寫一則貼文</h1>
+        <p>先選範式，再填今天實際發生的真事。模板是骨，肉一定要是真的——沒有真材料就不會呼叫 AI。</p>
+      </div>
+
+      <div class="grid2">
+        <!-- 輸入 -->
+        <div style="display:grid;gap:20px">
+          <section class="card">
+            <div class="ph"><h2>選一型範式</h2><span class="chip ghost" style="margin-left:auto">七選一</span></div>
+            <div class="pad">
+              <div class="types" id="types">
+                <button class="type" data-t="A1"><span class="code">A1</span><span class="nm">導流長文＋輪播</span><span class="eng">換名單</span></button>
+                <button class="type" data-t="A2"><span class="code">A2</span><span class="nm">圖一句迷因</span><span class="eng">低成本拉新</span></button>
+                <button class="type" data-t="A3"><span class="code">A3</span><span class="nm">大字二選一</span><span class="eng">逼留言</span></button>
+                <button class="type" data-t="A4" disabled><span class="code">A4</span><span class="nm">工具單 listicle</span><span class="eng">乾貨</span><span class="quota">本週已用 1／1</span></button>
+                <button class="type" data-t="A5" aria-pressed="true"><span class="code">A5</span><span class="nm">素樸實作碎念</span><span class="eng">養信任</span></button>
+                <button class="type" data-t="A6"><span class="code">A6</span><span class="nm">五步驟＋重複節奏</span><span class="eng">講方法</span></button>
+                <button class="type" data-t="A7"><span class="code">A7</span><span class="nm">認知反轉大字</span><span class="eng">蹭常識</span></button>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="ph"><h2>今天發生了什麼真事</h2><span class="chip block" style="margin-left:auto">必填</span></div>
+            <div class="pad">
+              <label class="fl" for="seed">真材料<span class="req">＊</span></label>
+              <p class="hint">不用寫成文案，用講的就好。這週誰來了？發生什麼？誰說了什麼話？<br>有真數字、真對象、真事件，AI 才寫得出不像 AI 的東西。</p>
+              <textarea id="seed" rows="6" placeholder="例：今天下午陳社工帶新來的志工去家訪，案主阿嬤塞了一袋自己種的地瓜葉給他們……">今天下午三點，陳社工帶這個月剛來的志工小林去做家訪。小林出發前在門口站了一下，說有點緊張。回程時他手上多了一袋地瓜葉，阿嬤自己種的，硬塞給他們。我問他還緊張嗎，他說一路上都在聽阿嬤講以前的事，忘記緊張了。</textarea>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:15px;flex-wrap:wrap">
+                <button class="btn" id="gen">生成貼文</button>
+                <span class="hint" style="margin:0">平台：Threads · 預估 US$0.03</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- 產出 -->
+        <div style="display:grid;gap:20px">
+          <section class="card" id="emptyState">
+            <div class="empty">
+              <div class="ic">◷</div>
+              <p>產出會出現在這裡，連同守門報告。<br>每一則都會逐項檢查後才交到你手上。</p>
+            </div>
+          </section>
+
+          <section class="card reveal" id="outCard" hidden>
+            <div class="ph">
+              <h2>產出</h2>
+              <span class="chip ghost">A5 · Threads</span>
+              <span class="chip block" style="margin-left:auto">草稿 · 待補資料</span>
+            </div>
+            <div class="pad">
+              <p class="post">今天下午三點，陳社工帶小林去做家訪。
+
+小林是這個月剛來的志工。出發前他在門口站了一下，說有點緊張。
+
+回程的時候他手上多了一袋地瓜葉。阿嬤自己種的，硬塞給他們的。
+
+我問他還緊張嗎。他說一路上都在聽阿嬤講以前的事，忘記緊張了。
+
+我們今年走過 <mark class="redact">【請補資料】</mark><sup class="mk">G1</sup> 趟家訪。每一趟都是這樣開始的——有人站在門口猶豫，然後門開了。
+
+服務的 <mark class="ok">386 戶</mark><sup class="mk">G1 ✓</sup> 家庭裡，很多阿嬤都會塞東西給你。
+
+這些年我們一直在想，服務<mark class="fixed">品質</mark><sup class="mk">G5</sup>到底是什麼。也許就是有人願意把自己種的東西塞給你。</p>
+              <div style="display:flex;gap:9px;margin-top:18px;flex-wrap:wrap">
+                <button class="btn sm ghost">編輯</button>
+                <button class="btn sm ghost">重新生成</button>
+                <button class="btn sm ghost">微調⋯</button>
+                <button class="btn sm" disabled title="有未通過的守門項目，不能排程">排程發布</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="card reveal" id="reportCard" hidden>
+            <div class="ph">
+              <h2>守門報告</h2>
+              <span class="chip block" style="margin-left:auto">4 關通過 · 1 關需補</span>
+            </div>
+
+            <div class="guard">
+              <div class="grow">
+                <span class="gcode">G1</span><span class="gname">事實核對</span>
+                <span class="chip block">1 處遮蔽</span>
+              </div>
+              <div class="gnote">
+                <div class="fix">
+                  <span class="from">1,200 趟</span><span class="arrow">→</span><span class="to">【請補資料】</span>
+                  <span class="why">這個數字不在事實庫。要用的話，先去協會腦新增一條並附上出處。</span>
+                </div>
+                <div class="fix">
+                  <span class="to" style="color:var(--pass)">386 戶</span><span class="arrow">✓</span>
+                  <span class="why" style="width:auto">對應「2025 年服務家庭數」·出處：2025 年報 p.14 ·查核於 2026-03-12</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="guard">
+              <div class="grow"><span class="gcode">G2</span><span class="gname">紅線比對</span><span class="chip pass">通過</span></div>
+              <div class="gnote"><span>已比對 3 條紅線，未出現直接募款語言。</span></div>
+            </div>
+
+            <div class="guard">
+              <div class="grow"><span class="gcode">G3</span><span class="gname">勸募字號</span><span class="chip pass">未引用</span></div>
+            </div>
+
+            <div class="guard">
+              <div class="grow">
+                <span class="gcode">G5</span><span class="gname">用語檢查</span><span class="chip warn">1 處已自動修正</span>
+              </div>
+              <div class="gnote">
+                <div class="fix">
+                  <span class="from">質量</span><span class="arrow">→</span><span class="to">品質</span>
+                  <span class="why">大陸用語對照表 · 已自動替換</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="guard">
+              <div class="grow"><span class="gcode">G6</span><span class="gname">禁用句型</span><span class="chip pass">通過</span></div>
+              <div class="gnote"><span>未出現「不是 X 而是 Y」句型（A5 範式禁用）。</span></div>
+            </div>
+
+            <div class="cost">
+              <div>模型呼叫<b>2 次</b></div>
+              <div>輸入<b>2,140</b></div>
+              <div>輸出<b>486</b></div>
+              <div>本次花費<b>US$0.0287</b></div>
+              <div>耗時<b>6.4s</b></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 協會腦 ===================== -->
+    <div class="wrap" data-view="brain" hidden>
+      <div class="pagehead">
+        <div class="eyebrow">M-1 · 協會腦</div>
+        <h1>協會腦</h1>
+        <p>建檔一次，七個模組共用。事實庫是空的，所有產出都會是一堆「請補資料」——這裡填得越紮實，AI 寫得越像人。</p>
+      </div>
+
+      <div class="notice">
+        <span>⚑</span>
+        <div><b>勸募字號將於 96 天後到期。</b>「衛部救字第 1141360xxx 號」有效期至 2026-11-22，建議提前 3 個月開始準備換證資料。</div>
+      </div>
+
+      <div class="brainrows" style="margin-bottom:22px">
+        <div class="brainrow"><span class="nm">組織身分</span><span class="ct">全名、立案字號、主管機關</span><span class="chip pass">已完成</span></div>
+        <div class="brainrow"><span class="nm">勸募許可</span><span class="ct">1 張有效</span><span class="chip warn">將到期</span></div>
+        <div class="brainrow"><span class="nm">事實庫</span><span class="ct">12 條啟用 · 3 條停用</span><span class="chip pass">已完成</span></div>
+        <div class="brainrow"><span class="nm">紅線</span><span class="ct">3 條</span><span class="chip pass">已完成</span></div>
+        <div class="brainrow"><span class="nm">品牌語氣</span><span class="ct">缺範例貼文</span><span class="chip warn">待補</span></div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab">組織身分</button>
+        <button class="tab">勸募許可</button>
+        <button class="tab" aria-selected="true">事實庫</button>
+        <button class="tab">紅線</button>
+        <button class="tab">品牌語氣</button>
+      </div>
+
+      <section class="card">
+        <div class="ph">
+          <h2>事實庫</h2>
+          <span class="chip ghost">唯一可對外引用的數字來源</span>
+          <span style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn sm ghost">匯入 JSON</button>
+            <button class="btn sm">新增一條</button>
+          </span>
+        </div>
+        <div class="tblwrap">
+          <table>
+            <thead><tr><th>項目</th><th>數值</th><th>出處</th><th>查核日</th><th>狀態</th></tr></thead>
+            <tbody>
+              <tr><td>2025 年服務家庭數</td><td class="num">386 戶</td><td class="src">2025 年報 p.14</td><td class="num src">2026-03-12</td><td><span class="chip pass">啟用</span></td></tr>
+              <tr><td>累計服務人次</td><td class="num">12,480 人次</td><td class="src">2025 年報 p.14</td><td class="num src">2026-03-12</td><td><span class="chip pass">啟用</span></td></tr>
+              <tr><td>專職社工人數</td><td class="num">9 人</td><td class="src">內部人事系統</td><td class="num src">2026-06-01</td><td><span class="chip pass">啟用</span></td></tr>
+              <tr><td>服務據點數</td><td class="num">4 處</td><td class="src">官網「關於我們」</td><td class="num src">2026-05-20</td><td><span class="chip pass">啟用</span></td></tr>
+              <tr><td>2024 年服務家庭數</td><td class="num">341 戶</td><td class="src">2024 年報 p.11</td><td class="num src">2025-03-08</td><td><span class="chip ghost">停用</span></td></tr>
+              <tr><td>年度家訪趟次</td><td class="num" style="color:var(--block)">—</td><td class="src" style="color:var(--block)">無出處，待查證</td><td class="num src">—</td><td><span class="chip block">未確認</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="cost"><div style="line-height:1.7">停用的事實不會被刪除，只是不再供 AI 引用——保留稽核軌跡。<br>標為「未確認」的項目，G1 會一律遮蔽。</div></div>
+      </section>
+    </div>
+
+    <!-- ===================== 產出歷史 ===================== -->
+    <div class="wrap" data-view="hist" hidden>
+      <div class="pagehead">
+        <div class="eyebrow">產出歷史</div>
+        <h1>每一次生成都留下紀錄</h1>
+        <p>包含當時的輸入、守門報告與花費。守門擋下的那幾次也在裡面——被擋下不代表沒發生，成本一樣要記。</p>
+      </div>
+      <section class="card">
+        <div class="tblwrap">
+          <table>
+            <thead><tr><th>時間</th><th>模組</th><th>範式</th><th>守門結果</th><th>模型呼叫</th><th>花費</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="num src">08/06 15:22</td><td>M3 內容</td><td class="num">A5</td><td><span class="chip block">1 處遮蔽</span></td><td class="num">2</td><td class="num">US$0.0287</td><td><button class="btn sm ghost">看報告</button></td></tr>
+              <tr><td class="num src">08/06 11:04</td><td>M3 內容</td><td class="num">A4</td><td><span class="chip warn">2 處修正</span></td><td class="num">2</td><td class="num">US$0.0412</td><td><button class="btn sm ghost">看報告</button></td></tr>
+              <tr><td class="num src">08/05 16:47</td><td>M3 內容</td><td class="num">A3</td><td><span class="chip pass">全數通過</span></td><td class="num">2</td><td class="num">US$0.0193</td><td><button class="btn sm ghost">看報告</button></td></tr>
+              <tr><td class="num src">08/05 09:31</td><td>M3 內容</td><td class="num">A5</td><td><span class="chip pass">全數通過</span></td><td class="num">2</td><td class="num">US$0.0264</td><td><button class="btn sm ghost">看報告</button></td></tr>
+              <tr><td class="num src">08/04 14:12</td><td>M3 內容</td><td class="num">A7</td><td><span class="chip block">3 處遮蔽</span></td><td class="num">2</td><td class="num">US$0.0301</td><td><button class="btn sm ghost">看報告</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="cost"><div>本月累計 <b style="display:inline">US$0.63</b> · 17 次生成 · 平均每則 US$0.037</div></div>
+      </section>
+    </div>
+
+    <!-- ===================== 儀表板 ===================== -->
+    <div class="wrap" data-view="home" hidden>
+      <div class="pagehead">
+        <div class="eyebrow">儀表板</div>
+        <h1>這週的狀態</h1>
+        <p>協會腦填得越滿，產出被遮蔽的機率越低。</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="lb">協會腦完成度</div><div class="vl">80%</div><div class="bar"><i style="width:80%"></i></div><div class="sb">缺：品牌語氣的範例貼文</div></div>
+        <div class="stat"><div class="lb">本月生成</div><div class="vl">17</div><div class="bar"><i style="width:34%"></i></div><div class="sb">額度 50 則</div></div>
+        <div class="stat"><div class="lb">本月花費</div><div class="vl">US$0.63</div><div class="sb">上限 US$20</div></div>
+        <div class="stat"><div class="lb">守門通過率</div><div class="vl">71%</div><div class="sb">12／17 全數通過</div></div>
+      </div>
+      <div class="notice">
+        <span>⚑</span>
+        <div><b>本週還沒有排定的內容。</b>週三下午的個案會議之後是你設定的填寫時間——把當天聊到的事情記下來，就是這週的真材料。</div>
+      </div>
+      <section class="card">
+        <div class="ph"><h2>最近產出</h2><button class="btn sm ghost" style="margin-left:auto" data-go="hist">全部</button></div>
+        <div class="tblwrap">
+          <table>
+            <thead><tr><th>時間</th><th>範式</th><th>開頭</th><th>狀態</th></tr></thead>
+            <tbody>
+              <tr><td class="num src">08/06</td><td class="num">A5</td><td>今天下午三點，陳社工帶小林去做家訪⋯</td><td><span class="chip block">草稿</span></td></tr>
+              <tr><td class="num src">08/05</td><td class="num">A3</td><td>你覺得志工最需要的是熱情，還是⋯</td><td><span class="chip pass">已排程</span></td></tr>
+              <tr><td class="num src">08/05</td><td class="num">A5</td><td>阿嬤把電話掛掉之前說了一句⋯</td><td><span class="chip pass">已發布</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var views = document.querySelectorAll('[data-view]');
+  var navs  = document.querySelectorAll('.nav[data-v]');
+  function show(name){
+    views.forEach(function(v){ v.hidden = v.dataset.view !== name; });
+    navs.forEach(function(n){ n.setAttribute('aria-current', String(n.dataset.v === name)); });
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+  navs.forEach(function(n){ n.addEventListener('click', function(){ show(n.dataset.v); }); });
+  document.querySelectorAll('[data-go]').forEach(function(b){
+    b.addEventListener('click', function(){ show(b.dataset.go); });
+  });
+
+  document.querySelectorAll('#types .type').forEach(function(t){
+    t.addEventListener('click', function(){
+      document.querySelectorAll('#types .type').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      t.setAttribute('aria-pressed','true');
+    });
+  });
+
+  document.querySelectorAll('.tabs .tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      t.parentNode.querySelectorAll('.tab').forEach(function(x){ x.setAttribute('aria-selected','false'); });
+      t.setAttribute('aria-selected','true');
+    });
+  });
+
+  var seed = document.getElementById('seed');
+  var gen  = document.getElementById('gen');
+  var empty = document.getElementById('emptyState');
+  var out = document.getElementById('outCard');
+  var rep = document.getElementById('reportCard');
+
+  function sync(){ gen.disabled = seed.value.trim().length < 12; }
+  seed.addEventListener('input', sync); sync();
+
+  gen.addEventListener('click', function(){
+    gen.disabled = true;
+    gen.innerHTML = '<span class="spin"></span>生成中⋯';
+    setTimeout(function(){ gen.innerHTML = '<span class="spin"></span>守門檢查中⋯'; }, 1100);
+    setTimeout(function(){
+      gen.textContent = '重新生成';
+      gen.disabled = false;
+      empty.hidden = true; out.hidden = false; rep.hidden = false;
+    }, 2200);
+  });
+})();
+</script>
